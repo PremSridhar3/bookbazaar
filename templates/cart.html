@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Your Cart{% endblock %}
+
+{% block content %}
+
+{% load django_bootstrap5 %}
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+
+    <div class="container mt-4">
+        <h2>Your Shopping Cart</h2>
+        <a href="{% url 'home' %}" class="btn btn-outline-info mt-3">Back to Shopping</a>
+        {% if user.is_authenticated %}
+            {% if cart_items %}
+                <table class="table table-bordered table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Book Name</th>
+                            <th scope="col">Author</th>
+                            <th scope="col">Genre</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in cart_items %}
+                            <tr>
+                                <td>{{ order.book.book_name }}</td>
+                                <td>{{ order.book.author }}</td>
+                                <td>{{ order.book.genre }}</td>
+                                <td>{{ order.book.price|floatformat:2 }}</td>
+                                <td>{{ order.quantity }}</td>
+                                <td>
+                                    <!-- Add buttons for updating and removing items from cart -->
+                                    <form action="{% url 'update_cart' order.cart_id %}" method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-warning btn-sm">Add Quantity</button>
+                                    </form>
+                                    <form action="{% url 'remove_from_cart' order.cart_id %}" method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            {% else %}
+                <p>Your cart is empty.</p>
+            {% endif %}
+        {% else %}
+            <p class="text-warning">You need to be logged in to view your cart.</p>
+        {% endif %}
+    </div>
+{% endblock %}
